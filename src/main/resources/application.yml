@@ -1,0 +1,71 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: API-GATEWAY
+  cloud:
+    gateway:
+      routes:
+        - id: USER
+          uri: lb://USER
+          predicates:
+            - Path=/users/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: USER
+                fallbackuri: forward:/userFallBackMethod
+        - id: EMAIL
+          uri: lb://EMAIL
+          predicates:
+            - Path=/email/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: EMAIL
+                fallbackuri: forward:/emailFallBackMethod
+        - id: TRANSACTIONS
+          uri: lb://TRAMSACTIONS
+          predicates:
+            - Path=/accounts/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: ACCOUNT
+                fallbackuri: forward:/accountFallBackMethod
+        - id: LOAN
+          uri: lb://LOAN
+          predicates:
+            - Path=/loans/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: LOAN
+                fallbackuri: forward:/loanFallBackMethod
+        - id: INVESTMENTS
+          uri: lb://INVESTMENTS
+          predicates:
+            - Path=/investments/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: INVESTMENTS
+                fallbackuri: forward:/investmentFallBackMethod
+
+
+hystrix:
+  command:
+    fallbackcmd:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 4000
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream
+
